@@ -480,6 +480,123 @@ function Add-TRResult
     }
 }
 
+function New-TRResult
+{
+    param
+    (
+        [Parameter(Mandatory=$true)]
+        [Alias('id')]
+        [int]
+        $TestId,
+
+        [Parameter(Mandatory=$true)]
+        [int]
+        $StatusId,
+
+        [Parameter(Mandatory=$false)]
+        [string]
+        $Comment,
+
+        [Parameter(Mandatory=$false)]
+        [string]
+        $Version,
+
+        [Parameter(Mandatory=$false)]
+        [string]
+        $Elapsed,
+
+        [Parameter(Mandatory=$false)]
+        [string[]]
+        $Defects,
+
+        [Parameter(Mandatory=$false)]
+        [int]
+        $AssignedToId,
+
+        [Parameter(Mandatory=$false)]
+        [HashTable]
+        $CustomFields
+    )
+
+    PROCESS
+    {
+        $Parameters = @{}
+
+        $Parameters.Add("test_id", $TestId)
+        $Parameters.Add("status_id", $StatusId)
+
+        if ( $PSBoundParameters.ContainsKey("Comment") )
+        {
+            $Parameters.Add("comment", $Comment)
+        }
+
+        if ( $PSBoundParameters.ContainsKey("Version") )
+        {
+            $Parameters.Add("version", $Version)
+        }
+
+        if ( $PSBoundParameters.ContainsKey("Elapsed") )
+        {
+            $Parameters.Add("elapsed", $Elapsed)
+        }
+
+        if ( $PSBoundParameters.ContainsKey("Defects") )
+        {
+            $Parameters.Add("defects", ([String]::Join(",", $Defects)))
+        }
+
+        if ( $PSBoundParameters.ContainsKey("AssignedToId") )
+        {
+            $Parameters.Add("assignedto_id", $AssignedToId)
+        }
+
+        $CustomFields.Keys |% {
+            $Key = $_
+            if ( $Key -notmatch "^custom_" )
+            {
+                $Key = "custom_" + $Key
+            }
+
+            $Parameters.Add($Key, $CustomFields[$_])
+        }
+
+        $Parameters
+    }
+}
+
+function Add-TRResults
+{
+    param
+    (
+        [Parameter(Mandatory=$true)]
+        [Alias('id')]
+        [int]
+        $RunId,
+
+        [Parameter(Mandatory=$true)]
+        [HashTable[]]
+        $Results
+    )
+
+    PROCESS
+    {
+        $Uri = "add_results/$RunId"
+
+        $Parameters = @{}
+
+        if ( $Results -is [Array] )
+        {
+            $Parameters = @{ results = $Results }
+        }
+        else
+        {
+            $Parameters = @{ results = @( $Results ) }
+        }
+
+        Submit-TRUri -Uri $Uri -Data $Parameters
+    }
+}
+
 function New-TRRun
 {
     param
