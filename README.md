@@ -18,7 +18,7 @@ There's no return value here - it just sets up an internal instance of the .Net 
 
 If you have a hosted TestRail subscription, your Uri will be `https://<tenantname>.testrail.net/`. The API suffix is added by the client.
 
-## Commandlet Naming
+## Cmdlet Naming
 
 This module tries to use Powershell Verbs properly. If the TestRail API method conflicts with the Powershell meaning of the Verb then I've used the Powershell convention. This hopefully makes it less confusing to people already familiar with Powershell.
 
