@@ -476,7 +476,7 @@ function Add-TestRailResult
             $Parameters.Add($Key, $CustomFields[$_])
         }
 
-        Submit-TestRailUri -Uri $Uri -Data $Parameters
+        Submit-TestRailUri -Uri $Uri -Parameters $Parameters
     }
 }
 
@@ -564,7 +564,7 @@ function Add-TestRailResultForCase
             $Parameters.Add($Key, $CustomFields[$_])
         }
 
-        Submit-TestRailUri -Uri $Uri -Data $Parameters
+        Submit-TestRailUri -Uri $Uri -Parameters $Parameters
     }
 }
 
@@ -695,7 +695,7 @@ function Add-TestRailResultsForCases
             $Parameters = @{ results = @( $Results ) }
         }
 
-        Submit-TestRailUri -Uri $Uri -Data $Parameters
+        Submit-TestRailUri -Uri $Uri -Parameters $Parameters
     }
 }
 
@@ -734,11 +734,11 @@ function Add-TestRailResults
             $Parameters = @{ results = @( $Results ) }
         }
 
-        Submit-TestRailUri -Uri $Uri -Data $Parameters
+        Submit-TestRailUri -Uri $Uri -Parameters $Parameters
     }
 }
 
-function New-TestRailRun
+function Start-TestRailRun
 {
     param
     (
@@ -782,17 +782,10 @@ function New-TestRailRun
     PROCESS
     {
         $Uri = "add_run/$ProjectId"
-        $Parameters = [System.Web.HttpUtility]::ParseQueryString([String]::Empty)
 
-        if ( $PSBoundParameters.ContainsKey("SuiteId") )
-        {
-            Add-UriParameters -Parameters $Parameters -Hash @{ suite_id = $SuiteId }
-        }
-        if ( $PSBoundParameters.ContainsKey("MilestoneId") )
-        {
-            Add-UriParameters -Parameters $Parameters -Hash @{ milestone_id = $MilestoneId }
-        }
-        Add-UriParameters -Parameters $Parameters -Hash @{
+        $Parameters = @{
+            milestone_id = $MilestoneId
+            suite_id = $SuiteId
             name = $Name
             description = $Description
             assignedto_id = $AssignedToId
@@ -800,10 +793,10 @@ function New-TestRailRun
         }
         if ( $PSBoundParameters.ContainsKey("CaseId") )
         {
-            Add-UriParameters -Parameters $Parameters -Hash @{ case_ids = [String]::Join(",", $CaseId) }
+            $Parameters.case_ids = $CaseId
         }
 
-        Request-TestRailUri -Uri $Uri -Parameters $Parameters
+        Submit-TestRailUri -Uri $Uri -Parameters $Parameters
     }
 }
 
@@ -876,7 +869,7 @@ function Set-TestRailRun
     }
 }
 
-function Close-TestRailRun
+function Stop-TestRailRun
 {
     param
     (
@@ -889,7 +882,7 @@ function Close-TestRailRun
     PROCESS
     {
         $Uri = "close_run/$RunId"
-        Request-TestRailUri -Uri $Uri
+        Submit-TestRailUri -Uri $Uri
     }
 }
 
@@ -1013,7 +1006,7 @@ function Submit-TestRailUri
 
         [Parameter(Mandatory=$false)]
         [HashTable]
-        $Data = @{}
+        $Parameters = @{}
     )
 
     if ( $Script:ApiClient -eq $null )
@@ -1021,7 +1014,7 @@ function Submit-TestRailUri
         throw New-Object Exception -ArgumentList "You must call Initialize-TestRailSession first"
     }
 
-    $Result = $Script:ApiClient.SendPost($Uri, $Data)
+    $Result = $Script:ApiClient.SendPost($Uri, $Parameters)
 
     New-ObjectHash -Object $Result
 }

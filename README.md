@@ -29,7 +29,7 @@ Likewise, the API operation `add_run` creates a new Test Run, but `New-TestRailR
 Generally:
 
 * `Add-` to create a new instance of a thing, e.g. `Add-TestRailResult`, `Add-TestRailResultsForCases`
-* `Close-` to end or conclude an open session (e.g. Test Run), e.g. `Close-TestRailRun`
+* `Start/Stop-` to start/begin or conclude/end a session (e.g. Test Run), e.g. `Start-TestRailRun`, `Stop-TestRailRun`
 * `Get-` to retrieve a resource, e.g. `Get-TestRailProjects`, `Get-TestRailTests`
 * `New-` create a new instance of a resource, e.g. `New-TestRailResult`
 * `Set-` change the data associated with an existing resource, e.g. `Set-TestRailRun`
@@ -64,10 +64,10 @@ or perhaps
 
     PS> $project = Get-TestRailProjects | Where name -eq "My Project"
     PS> $suite = Get-TestRailSuites -ProjectId $project.id | Where name -eq "Test Suite"
-    PS> $run = New-TestRailRun -ProjectId $project.id -SuiteId $suite.id -Name "My Test Run" -Description "A test run where I test things" -CaseId 17,36,142,86
+    PS> $run = Start-TestRailRun -ProjectId $project.id -SuiteId $suite.id -Name "My Test Run" -AssignedTo 1 -Description "A test run where I test things" -CaseId 17,36,142,86
     # Do some tests
     PS> $results = @()
     PS> $results += New-TestRailResult -CaseId 17 -StatusId 1 -Comment "Everything was fine" -Elapsed "3m" -CustomFields @{ "custom_colour" = "Blue" }
     PS> $results += New-TestRailResult -CaseId 36 -StatusId 2 -Comment "Something useful about the test case" -CustomFields @{ "detail" = "The custom_ prefix will be added automatically"; colour = "Yellow" }
     PS> Add-TestRailResultsForCases -RunId $run.id -Results $results
-    PS> Close-TestRailRun -RunId $run.id
+    PS> Stop-TestRailRun -RunId $run.id
