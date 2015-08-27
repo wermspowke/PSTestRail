@@ -1,7 +1,7 @@
 ﻿$Script:ApiClient = $null
 $Script:Debug = $false
 
-function Initialize-TRSession
+function Initialize-TestRailSession
 {
     param
     (
@@ -24,7 +24,7 @@ function Initialize-TRSession
     $Script:ApiClient.Password = $Password
 }
 
-function Get-TRProjects
+function Get-TestRailProjects
 {
     param
     (
@@ -48,10 +48,10 @@ function Get-TRProjects
         }
     }
 
-    Request-TRUri -Uri $Uri -Parameters $Parameters
+    Request-TestRailUri -Uri $Uri -Parameters $Parameters
 }
 
-function Get-TRSuites
+function Get-TestRailSuites
 {
     param
     (
@@ -68,12 +68,12 @@ function Get-TRSuites
             $Uri = "get_suites/$PID"
             $Parameters = [System.Web.HttpUtility]::ParseQueryString([String]::Empty)
 
-            Request-TRUri -Uri $Uri -Parameters $Parameters
+            Request-TestRailUri -Uri $Uri -Parameters $Parameters
         }
     }
 }
 
-function Get-TRSuite
+function Get-TestRailSuite
 {
     param
     (
@@ -90,12 +90,12 @@ function Get-TRSuite
             $Uri = "get_suite/$SID"
             $Parameters = [System.Web.HttpUtility]::ParseQueryString([String]::Empty)
 
-            Request-TRUri -Uri $Uri -Parameters $Parameters
+            Request-TestRailUri -Uri $Uri -Parameters $Parameters
         }
     }
 }
 
-function Get-TRSections
+function Get-TestRailSections
 {
     param
     (
@@ -120,11 +120,11 @@ function Get-TRSections
             Add-UriParameters -Parameters $Parameters -Hash @{ suite_id = $SuiteId } 
         }
 
-        Request-TRUri -Uri $Uri -Parameters $Parameters
+        Request-TestRailUri -Uri $Uri -Parameters $Parameters
     }
 }
 
-function Get-TRRuns
+function Get-TestRailRuns
 {
     param
     (
@@ -139,11 +139,11 @@ function Get-TRRuns
         $Uri = "get_runs/$ProjectId"
         $Parameters = [System.Web.HttpUtility]::ParseQueryString([String]::Empty)
 
-        Request-TRUri -Uri $Uri -Parameters $Parameters
+        Request-TestRailUri -Uri $Uri -Parameters $Parameters
     }
 }
 
-function Get-TRRun
+function Get-TestRailRun
 {
     param
     (
@@ -158,11 +158,11 @@ function Get-TRRun
         $Uri = "get_run/$RunId"
         $Parameters = [System.Web.HttpUtility]::ParseQueryString([String]::Empty)
 
-        Request-TRUri -Uri $Uri -Parameters $Parameters
+        Request-TestRailUri -Uri $Uri -Parameters $Parameters
     }
 }
 
-function Get-TRProject
+function Get-TestRailProject
 {
     param
     (
@@ -177,11 +177,11 @@ function Get-TRProject
         $Uri = "get_project/$ProjectId"
         $Parameters = [System.Web.HttpUtility]::ParseQueryString([String]::Empty)
 
-        Request-TRUri -Uri $Uri -Parameters $Parameters
+        Request-TestRailUri -Uri $Uri -Parameters $Parameters
     }
 }
 
-function Get-TRTests
+function Get-TestRailTests
 {
     param
     (
@@ -205,11 +205,11 @@ function Get-TRTests
             Add-UriParameters -Parameters $Parameters -Hash @{ status_id = [String]::Join(",", $StatusId ) }
         }
 
-        Request-TRUri -Uri $Uri -Parameters $Parameters
+        Request-TestRailUri -Uri $Uri -Parameters $Parameters
     }
 }
 
-function Get-TRResults
+function Get-TestRailResults
 {
     param
     (
@@ -256,11 +256,11 @@ function Get-TRResults
             Add-UriParameters -Parameters $Parameters -Hash @{ status_id = [String]::Join(",", $StatusId ) }
         }
 
-        Request-TRUri -Uri $Uri -Parameters $Parameters
+        Request-TestRailUri -Uri $Uri -Parameters $Parameters
     }
 }
 
-function Get-TRResultsForCase
+function Get-TestRailResultsForCase
 {
     param
     (
@@ -312,11 +312,11 @@ function Get-TRResultsForCase
             Add-UriParameters -Parameters $Parameters -Hash @{ status_id = [String]::Join(",", $StatusId ) }
         }
 
-        Request-TRUri -Uri $Uri -Parameters $Parameters
+        Request-TestRailUri -Uri $Uri -Parameters $Parameters
     }
 }
 
-function Get-TRResultsForRun
+function Get-TestRailResultsForRun
 {
     param
     (
@@ -392,11 +392,11 @@ function Get-TRResultsForRun
             Add-UriParameters -Parameters $Parameters -Hash @{ status_id = [String]::Join(",", $StatusId ) }
         }
 
-        Request-TRUri -Uri $Uri -Parameters $Parameters
+        Request-TestRailUri -Uri $Uri -Parameters $Parameters
     }
 }
 
-function Add-TRResult
+function Add-TestRailResult
 {
     param
     (
@@ -431,7 +431,7 @@ function Add-TRResult
 
         [Parameter(Mandatory=$false)]
         [HashTable]
-        $CustomFields
+        $CustomFields = @{}
     )
 
     PROCESS
@@ -476,11 +476,269 @@ function Add-TRResult
             $Parameters.Add($Key, $CustomFields[$_])
         }
 
-        Submit-TRUri -Uri $Uri -Data $Parameters
+        Submit-TestRailUri -Uri $Uri -Parameters $Parameters
     }
 }
 
-function New-TRRun
+function Add-TestRailResultForCase
+{
+    param
+    (
+        [Parameter(Mandatory=$true)]
+        [Alias('id')]
+        [int]
+        $RunId,
+
+        [Parameter(Mandatory=$true)]
+        [int]
+        $CaseId,
+
+        [Parameter(Mandatory=$true)]
+        [int]
+        $StatusId,
+
+        [Parameter(Mandatory=$false)]
+        [string]
+        $Comment,
+
+        [Parameter(Mandatory=$false)]
+        [string]
+        $Version,
+
+        [Parameter(Mandatory=$false)]
+        [string]
+        $Elapsed,
+
+        [Parameter(Mandatory=$false)]
+        [string[]]
+        $Defects,
+
+        [Parameter(Mandatory=$false)]
+        [int]
+        $AssignedToId,
+
+        [Parameter(Mandatory=$false)]
+        [HashTable]
+        $CustomFields = @{}
+    )
+
+    PROCESS
+    {
+        $Uri = "add_result_for_case/$RunId/$CaseId"
+        $Parameters = @{}
+
+        $Parameters.Add("status_id", $StatusId)
+
+        if ( $PSBoundParameters.ContainsKey("Comment") )
+        {
+            $Parameters.Add("comment", $Comment)
+        }
+
+        if ( $PSBoundParameters.ContainsKey("Version") )
+        {
+            $Parameters.Add("version", $Version)
+        }
+
+        if ( $PSBoundParameters.ContainsKey("Elapsed") )
+        {
+            $Parameters.Add("elapsed", $Elapsed)
+        }
+
+        if ( $PSBoundParameters.ContainsKey("Defects") )
+        {
+            $Parameters.Add("defects", ([String]::Join(",", $Defects)))
+        }
+
+        if ( $PSBoundParameters.ContainsKey("AssignedToId") )
+        {
+            $Parameters.Add("assignedto_id", $AssignedToId)
+        }
+
+        $CustomFields.Keys |% {
+            $Key = $_
+            if ( $Key -notmatch "^custom_" )
+            {
+                $Key = "custom_" + $Key
+            }
+
+            $Parameters.Add($Key, $CustomFields[$_])
+        }
+
+        Submit-TestRailUri -Uri $Uri -Parameters $Parameters
+    }
+}
+
+function New-TestRailResult
+{
+    param
+    (
+        [Parameter(Mandatory=$true, ParameterSetName="ResultForTest")]
+        [int]
+        $TestId,
+
+        [Parameter(Mandatory=$true, ParameterSetName="ResultForCase")]
+        [int]
+        $CaseId,
+
+        [Parameter(Mandatory=$true)]
+        [int]
+        $StatusId,
+
+        [Parameter(Mandatory=$false)]
+        [string]
+        $Comment,
+
+        [Parameter(Mandatory=$false)]
+        [string]
+        $Version,
+
+        [Parameter(Mandatory=$false)]
+        [string]
+        $Elapsed,
+
+        [Parameter(Mandatory=$false)]
+        [string[]]
+        $Defects,
+
+        [Parameter(Mandatory=$false)]
+        [int]
+        $AssignedToId,
+
+        [Parameter(Mandatory=$false)]
+        [HashTable]
+        $CustomFields = @{}
+    )
+
+    PROCESS
+    {
+        $Parameters = @{}
+
+        switch ($PSCmdlet.ParameterSetName)
+        {
+            "ResultForTest" { $Parameters.Add("test_id", $TestId) }
+            "ResultForCase" { $Parameters.Add("case_id", $CaseId) }
+        }
+
+        $Parameters.Add("status_id", $StatusId)
+
+        if ( $PSBoundParameters.ContainsKey("Comment") )
+        {
+            $Parameters.Add("comment", $Comment)
+        }
+
+        if ( $PSBoundParameters.ContainsKey("Version") )
+        {
+            $Parameters.Add("version", $Version)
+        }
+
+        if ( $PSBoundParameters.ContainsKey("Elapsed") )
+        {
+            $Parameters.Add("elapsed", $Elapsed)
+        }
+
+        if ( $PSBoundParameters.ContainsKey("Defects") )
+        {
+            $Parameters.Add("defects", ([String]::Join(",", $Defects)))
+        }
+
+        if ( $PSBoundParameters.ContainsKey("AssignedToId") )
+        {
+            $Parameters.Add("assignedto_id", $AssignedToId)
+        }
+
+        $CustomFields.Keys |% {
+            $Key = $_
+            if ( $Key -notmatch "^custom_" )
+            {
+                $Key = "custom_" + $Key
+            }
+
+            $Parameters.Add($Key, $CustomFields[$_])
+        }
+
+        $Parameters
+    }
+}
+
+function Add-TestRailResultsForCases
+{
+    param
+    (
+        [Parameter(Mandatory=$true)]
+        [Alias('id')]
+        [int]
+        $RunId,
+
+        [Parameter(Mandatory=$true)]
+        [HashTable[]]
+        $Results
+    )
+
+    PROCESS
+    {
+        $Uri = "add_results_for_cases/$RunId"
+
+        $NotCaseResults =  ($Results | Where-Object case_id -Eq $null).Length -ne 0
+        if ( $NotCaseResults )
+        {
+            throw (New-Object ArgumentException -ArgumentList "Results must contain a 'case_id' property. Did you use New-TestRailResult -CaseId <x> ?")
+        }
+
+        $Parameters = @{}
+
+        if ( $Results -is [Array] )
+        {
+            $Parameters = @{ results = $Results }
+        }
+        else
+        {
+            $Parameters = @{ results = @( $Results ) }
+        }
+
+        Submit-TestRailUri -Uri $Uri -Parameters $Parameters
+    }
+}
+
+function Add-TestRailResults
+{
+    param
+    (
+        [Parameter(Mandatory=$true)]
+        [Alias('id')]
+        [int]
+        $RunId,
+
+        [Parameter(Mandatory=$true)]
+        [HashTable[]]
+        $Results
+    )
+
+    PROCESS
+    {
+        $Uri = "add_results/$RunId"
+
+        $NotTestResults =  ($Results | Where-Object test_id -Eq $null).Length -ne 0
+        if ( $NotTestResults )
+        {
+            throw (New-Object ArgumentException -ArgumentList "Results must contain a 'test_id' property. Did you use New-TestRailResult -TestId <x> ?")
+        }
+
+        $Parameters = @{}
+
+        if ( $Results -is [Array] )
+        {
+            $Parameters = @{ results = $Results }
+        }
+        else
+        {
+            $Parameters = @{ results = @( $Results ) }
+        }
+
+        Submit-TestRailUri -Uri $Uri -Parameters $Parameters
+    }
+}
+
+function Start-TestRailRun
 {
     param
     (
@@ -524,17 +782,10 @@ function New-TRRun
     PROCESS
     {
         $Uri = "add_run/$ProjectId"
-        $Parameters = [System.Web.HttpUtility]::ParseQueryString([String]::Empty)
 
-        if ( $PSBoundParameters.ContainsKey("SuiteId") )
-        {
-            Add-UriParameters -Parameters $Parameters -Hash @{ suite_id = $SuiteId }
-        }
-        if ( $PSBoundParameters.ContainsKey("MilestoneId") )
-        {
-            Add-UriParameters -Parameters $Parameters -Hash @{ milestone_id = $MilestoneId }
-        }
-        Add-UriParameters -Parameters $Parameters -Hash @{
+        $Parameters = @{
+            milestone_id = $MilestoneId
+            suite_id = $SuiteId
             name = $Name
             description = $Description
             assignedto_id = $AssignedToId
@@ -542,14 +793,14 @@ function New-TRRun
         }
         if ( $PSBoundParameters.ContainsKey("CaseId") )
         {
-            Add-UriParameters -Parameters $Parameters -Hash @{ case_ids = [String]::Join(",", $CaseId) }
+            $Parameters.case_ids = $CaseId
         }
 
-        Request-TRUri -Uri $Uri -Parameters $Parameters
+        Submit-TestRailUri -Uri $Uri -Parameters $Parameters
     }
 }
 
-function Set-TRRun
+function Set-TestRailRun
 {
     param
     (
@@ -609,16 +860,16 @@ function Set-TRRun
 
         if ( $Parameters.Count -ne 0 )
         {
-            Request-TRUri -Uri $Uri -Parameters $Parameters
+            Request-TestRailUri -Uri $Uri -Parameters $Parameters
         }
         else
         {
-            Get-TRRun -RunId $RunId
+            Get-TestRailRun -RunId $RunId
         }
     }
 }
 
-function Close-TRRun
+function Stop-TestRailRun
 {
     param
     (
@@ -631,7 +882,7 @@ function Close-TRRun
     PROCESS
     {
         $Uri = "close_run/$RunId"
-        Request-TRUri -Uri $Uri
+        Submit-TestRailUri -Uri $Uri
     }
 }
 
@@ -694,7 +945,7 @@ function ConvertFrom-UnixTimestamp
     }
 }
 
-function Set-TRDebug
+function Set-TestRailDebug
 {
     param
     (
@@ -706,12 +957,12 @@ function Set-TRDebug
     $Script:Debug = $Enabled
 }
 
-function Get-TRDebug
+function Get-TestRailDebug
 {
     $Script:Debug
 }
 
-function Request-TRUri
+function Request-TestRailUri
 {
     param
     (
@@ -726,7 +977,7 @@ function Request-TRUri
 
     if ( $Script:ApiClient -eq $null )
     {
-        throw New-Object Exception -ArgumentList "You must call Initialize-TRSession first"
+        throw New-Object Exception -ArgumentList "You must call Initialize-TestRailSession first"
     }
 
     $RealUri = $Uri
@@ -745,7 +996,7 @@ function Request-TRUri
     New-ObjectHash -Object $Result
 }
 
-function Submit-TRUri
+function Submit-TestRailUri
 {
     param
     (
@@ -755,15 +1006,15 @@ function Submit-TRUri
 
         [Parameter(Mandatory=$false)]
         [HashTable]
-        $Data = @{}
+        $Parameters = @{}
     )
 
     if ( $Script:ApiClient -eq $null )
     {
-        throw New-Object Exception -ArgumentList "You must call Initialize-TRSession first"
+        throw New-Object Exception -ArgumentList "You must call Initialize-TestRailSession first"
     }
 
-    $Result = $Script:ApiClient.SendPost($Uri, $Data)
+    $Result = $Script:ApiClient.SendPost($Uri, $Parameters)
 
     New-ObjectHash -Object $Result
 }
@@ -795,7 +1046,7 @@ function Add-UriParameters
     }
 }
 
-function Get-TRApiClient
+function Get-TestRailApiClient
 {
     $Script:ApiClient
 }
@@ -827,25 +1078,25 @@ function New-ObjectHash
 
 <#
 Export-ModuleMember -Function @(
-    'Add-TRResult',
-    'Close-TRRun',
-    'Get-TRDebug',
-    'Get-TRProject',
-    'Get-TRProjects',
-    'Get-TRResults',
-    'Get-TRResultsForCase',
-    'Get-TRResultsForRun',
-    'Get-TRRun',
-    'Get-TRRuns',
-    'Get-TRSections',
-    'Get-TRSuite',
-    'Get-TRSuites',
-    'Get-TRTests',
-    'Initialize-TRSession',
-    'New-TRRun',
-    'Request-TRUri',
-    'Set-TRDebug',
-    'Set-TRRun',
-    'Submit-TRUri'
+    'Add-TestRailResult',
+    'Close-TestRailRun',
+    'Get-TestRailDebug',
+    'Get-TestRailProject',
+    'Get-TestRailProjects',
+    'Get-TestRailResults',
+    'Get-TestRailResultsForCase',
+    'Get-TestRailResultsForRun',
+    'Get-TestRailRun',
+    'Get-TestRailRuns',
+    'Get-TestRailSections',
+    'Get-TestRailSuite',
+    'Get-TestRailSuites',
+    'Get-TestRailTests',
+    'Initialize-TestRailSession',
+    'New-TestRailRun',
+    'Request-TestRailUri',
+    'Set-TestRailDebug',
+    'Set-TestRailRun',
+    'Submit-TestRailUri'
 )
 #>
