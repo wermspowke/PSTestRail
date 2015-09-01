@@ -103,7 +103,14 @@ VariablesToExport = '*'
 AliasesToExport = '*'
 
 # List of all modules packaged with this module
-ModuleList = @('.\PSTestRail.psm1')
+ModuleList = @(
+    'PSTestRail.psm1',
+    'Operations-Runs.psm1',
+    'Operations-Results.psm1',
+    'Operations-Cases.psm1',
+    'Operations-Projects.psm1',
+    'Operations-Suites.psm1'
+)
 
 # List of all files packaged with this module
 # FileList = @()
