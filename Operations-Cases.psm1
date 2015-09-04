@@ -182,39 +182,39 @@ function Add-TestRailCase
     PROCESS
     {
         $Uri = "add_case/$SectionId"
-        $Parameters = [System.Web.HttpUtility]::ParseQueryString([String]::Empty)
+        $Parameters = @{}
 
-        Add-UriParameters -Parameters $Parameters -Hash @{ "title" = $Title }
+        $Parameters["title"] = $Title
 
         
         if ( $PSBoundParameters.ContainsKey("TypeId") )
         {
-            Add-UriParameters -Parameters $Parameters -Hash @{ "type_id" = $TypeId }
+            $Parameters["type_id"] = $TypeId
         }
         
         if ( $PSBoundParameters.ContainsKey("PriorityId") )
         {
-            Add-UriParameters -Parameters $Parameters -Hash @{ "priority_id" = $PriorityId }
+            $Parameters["priority_id"] = $PriorityId
         }
         
         if ( $PSBoundParameters.ContainsKey("Estimate") )
         {
-            Add-UriParameters -Parameters $Parameters -Hash @{ "estimate" = $Estimate }
+            $Parameters["estimate"] = $Estimate
         }
 
         if ( $PSBoundParameters.ContainsKey("MilestoneId") )
         {
-            Add-UriParameters -Parameters $Parameters -Hash @{ "milestone_id" = $MilestoneId }
+            $Parameters["milestone_id"] = $MilestoneId
         }
 
         if ( $PSBoundParameters.ContainsKey("MilestoneId") )
         {
-            Add-UriParameters -Parameters $Parameters -Hash @{ "milestone_id" = $MilestoneId }
+            $Parameters[ "milestone_id"] = $MilestoneId
         }
         
         if ( $PSBoundParameters.ContainsKey("Refs") )
         {
-            Add-UriParameters -Parameters $Parameters -Hash @{ refs = [String]::Join(",", $Refs ) }
+            $Parameters["refs"] = [string]::Join(",", $Refs)
         }
 
         $CustomFields.Keys |% {
@@ -272,41 +272,41 @@ function Set-TestRailCase
     PROCESS
     {
         $Uri = "update_case/$CaseId"
-        $Parameters = [System.Web.HttpUtility]::ParseQueryString([String]::Empty)
+        $Parameters = @{}
 
         if ( $PSBoundParameters.ContainsKey("Title") )
         {
-            Add-UriParameters -Parameters $Parameters -Hash @{ "title" = $Title }
+            $Parameters["title"] = $Title
         }
 
         if ( $PSBoundParameters.ContainsKey("TypeId") )
         {
-            Add-UriParameters -Parameters $Parameters -Hash @{ "type_id" = $TypeId }
+            $Parameters["type_id"] = $TypeId
         }
         
         if ( $PSBoundParameters.ContainsKey("PriorityId") )
         {
-            Add-UriParameters -Parameters $Parameters -Hash @{ "priority_id" = $PriorityId }
+            $Parameters["priority_id"] = $PriorityId
         }
         
         if ( $PSBoundParameters.ContainsKey("Estimate") )
         {
-            Add-UriParameters -Parameters $Parameters -Hash @{ "estimate" = $Estimate }
+            $Parameters["estimate"] = $Estimate
         }
 
         if ( $PSBoundParameters.ContainsKey("MilestoneId") )
         {
-            Add-UriParameters -Parameters $Parameters -Hash @{ "milestone_id" = $MilestoneId }
+            $Parameters["milestone_id"] = $MilestoneId
         }
 
         if ( $PSBoundParameters.ContainsKey("MilestoneId") )
         {
-            Add-UriParameters -Parameters $Parameters -Hash @{ "milestone_id" = $MilestoneId }
+            $Parameters["milestone_id"] = $MilestoneId
         }
         
         if ( $PSBoundParameters.ContainsKey("Refs") )
         {
-            Add-UriParameters -Parameters $Parameters -Hash @{ refs = [String]::Join(",", $Refs ) }
+            $Parameters["refs"] = [string]::Join(",", $Refs)
         }
 
         $CustomFields.Keys |% {
@@ -318,6 +318,25 @@ function Set-TestRailCase
 
             $Parameters.Add($Key, $CustomFields[$_])
         }
+
+        Submit-TestRailUri -Uri $Uri -Parameters $Parameters
+    }
+}
+
+function Remove-TestRailCase
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory=$true)]
+        [int]
+        $CaseId
+    )
+
+    PROCESS
+    {
+        $Uri = "delete_case/$CaseId"
+        $Parameters = @{}
 
         Submit-TestRailUri -Uri $Uri -Parameters $Parameters
     }
