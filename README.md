@@ -71,3 +71,12 @@ or perhaps
     PS> $results += New-TestRailResult -CaseId 36 -StatusId 2 -Comment "Something useful about the test case" -CustomFields @{ "detail" = "The custom_ prefix will be added automatically"; colour = "Yellow" }
     PS> Add-TestRailResultsForCases -RunId $run.id -Results $results
     PS> Stop-TestRailRun -RunId $run.id
+
+## Troubleshooting
+
+This is still a work in progress, so there are going to be bugs. To help with bug reports please use the module like this and include the information in your issue report:
+
+    PS> Import-Module .\PSTestRail
+    PS> Set-TestRailDebug -Enabled:$true
+    PS> $DebugPreference = "Continue"
+    # Now use as normal
