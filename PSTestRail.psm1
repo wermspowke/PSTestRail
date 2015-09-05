@@ -124,12 +124,10 @@ function Request-TestRailUri
         $RealUri += [String]::Format("&{0}", $Parameters.ToString())
     }
 
-    if ( $Script:Debug -eq $true )
-    {
-        Write-Warning ([String]::Format("Uri: [{0}]", $RealUri))
-    }
+    Write-ToDebug -Format "Submit-TestRailUri: Uri: {0}" -Parameters $RealUri
 
     $Result = $Script:ApiClient.SendGet($RealUri)
+    Write-ToDebug -Format "Request-TestRailUri: Result: {0}" -Parameters $Result.ToString()
 
     New-ObjectHash -Object $Result
 }
@@ -152,7 +150,11 @@ function Submit-TestRailUri
         throw New-Object Exception -ArgumentList "You must call Initialize-TestRailSession first"
     }
 
+    Write-ToDebug -Format "Submit-TestRailUri: Uri: {0}" -Parameters $Uri
+    Write-ToDebug -Format "Submit-TestRailUri: Parameters: {0}" -Parameters ([Newtonsoft.Json.JsonConvert]::SerializeObject($Parameters))
+
     $Result = $Script:ApiClient.SendPost($Uri, $Parameters)
+    Write-ToDebug -Format "Submit-TestRailUri: Result: {0}" -Parameters $Result.ToString()
 
     New-ObjectHash -Object $Result
 }
@@ -198,6 +200,8 @@ function New-ObjectHash
         $Object
     )
 
+    Write-ToDebug -Format "New-ObjectHash: Object is '{0}' from '{1}' ({2})" -Parameters $Object.GetType().FullName, $Object.GetType().Assembly.FullName, $Object.GetType().Assembly.Location
+
     if ( $Object -is [Newtonsoft.Json.Linq.JArray] )
     {
         $Object |% { New-ObjectHash -Object $_ }
@@ -211,5 +215,39 @@ function New-ObjectHash
     else
     {
         throw New-Object ArgumentException -ArgumentList ("Object must be a JObject or JArray but it is a " + $Object.GetType().Name)
+    }
+}
+
+function Write-ToDebug
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory=$true, ParameterSetName="Simple")]
+        [string]
+        $Message,
+
+        [Parameter(Mandatory=$true, ParameterSetName="Complex")]
+        [string]
+        $Format,
+
+        [Parameter(Mandatory=$true, ParameterSetName="Complex")]
+        [object[]]
+        $Parameters
+    )
+
+    if( $Script:Debug -eq $true )
+    {
+        switch  ($PSCmdlet.ParameterSetName)
+        {
+            "Simple"
+            {
+                Write-Debug -Message $Message
+            }
+            "Complex"
+            {
+                Write-Debug -Message ($Format -f $Parameters)
+            }
+        }
     }
 }
