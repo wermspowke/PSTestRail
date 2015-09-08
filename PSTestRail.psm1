@@ -124,7 +124,7 @@ function Request-TestRailUri
         $RealUri += [String]::Format("&{0}", $Parameters.ToString())
     }
 
-    Write-ToDebug -Format "Submit-TestRailUri: Uri: {0}" -Parameters $RealUri
+    Write-ToDebug -Format "Request-TestRailUri: Uri: {0}" -Parameters $RealUri
 
     $Result = $Script:ApiClient.SendGet($RealUri)
     Write-ToDebug -Format "Request-TestRailUri: Result: {0}" -Parameters $Result.ToString()
