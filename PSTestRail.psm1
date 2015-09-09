@@ -19,6 +19,8 @@ function Initialize-TestRailSession
         $Password
     )
 
+    Add-Type -AssemblyName System.Web
+
     $Script:ApiClient = New-Object Gurock.TestRail.APIClient -ArgumentList $Uri
     $Script:ApiClient.User = $User
     $Script:ApiClient.Password = $Password
