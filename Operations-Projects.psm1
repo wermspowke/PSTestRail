@@ -1,5 +1,6 @@
 ﻿function Get-TestRailProject
 {
+    [CmdletBinding()]
     param
     (
         [Parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
@@ -19,6 +20,7 @@
 
 function Get-TestRailProjects
 {
+    [CmdletBinding()]
     param
     (
         [Parameter(Mandatory=$false)]
@@ -26,22 +28,25 @@ function Get-TestRailProjects
         $IsCompleted
     )
 
-    $Uri = "get_projects"
-    $Parameters = [System.Web.HttpUtility]::ParseQueryString([String]::Empty)
-
-    if ( $PSBoundParameters.ContainsKey("IsCompleted") )
+    PROCESS
     {
-        if ( $IsCompleted -eq $true )
-        {
-            Add-UriParameters -Parameters $Parameters -Hash @{ is_completed = 1 } 
-        }
-        else
-        {
-            Add-UriParameters -Parameters $Parameters -Hash @{ is_completed = 0 }
-        }
-    }
+        $Uri = "get_projects"
+        $Parameters = [System.Web.HttpUtility]::ParseQueryString([String]::Empty)
 
-    Request-TestRailUri -Uri $Uri -Parameters $Parameters
+        if ( $PSBoundParameters.ContainsKey("IsCompleted") )
+        {
+            if ( $IsCompleted -eq $true )
+            {
+                Add-UriParameters -Parameters $Parameters -Hash @{ is_completed = 1 } 
+            }
+            else
+            {
+                Add-UriParameters -Parameters $Parameters -Hash @{ is_completed = 0 }
+            }
+        }
+
+        Request-TestRailUri -Uri $Uri -Parameters $Parameters
+    }
 }
 
 function Add-Project
@@ -68,27 +73,30 @@ function Add-Project
         $SuiteMode
     )
 
-    $Uri = "add_project"
-    $Parameters = @{}
-
-    $Parameters.name = $Name
-    if ( $PSBoundParameters.ContainsKey("Announcement") )
+    PROCESS
     {
-        $Parameters.announcement = $Announcement
-    }
+        $Uri = "add_project"
+        $Parameters = @{}
 
-    # Defaults to false is ommitted
-    if ( $ShowAnnouncement.IsPresent )
-    {
-        $Parameters.show_announcement = $true
-    }
+        $Parameters.name = $Name
+        if ( $PSBoundParameters.ContainsKey("Announcement") )
+        {
+            $Parameters.announcement = $Announcement
+        }
 
-    if ( $PSBoundParameters.ContainsKey("SuiteMode") )
-    {
-        $Parameters.suite_mode = $SuiteMode
-    }
+        # Defaults to false is ommitted
+        if ( $ShowAnnouncement.IsPresent )
+        {
+            $Parameters.show_announcement = $true
+        }
 
-    Submit-TestRailUri -Uri $Uri -Parameters $Parameters
+        if ( $PSBoundParameters.ContainsKey("SuiteMode") )
+        {
+            $Parameters.suite_mode = $SuiteMode
+        }
+
+        Submit-TestRailUri -Uri $Uri -Parameters $Parameters
+    }
 }
 
 function Set-Project
@@ -124,35 +132,38 @@ function Set-Project
         $IsCompleted
     )
 
-    $Uri = "update_project/$ProjectId"
-    $Parameters = @{}
+    PROCESS
+    {
+        $Uri = "update_project/$ProjectId"
+        $Parameters = @{}
     
-    if ( $PSBoundParameters.ContainsKey("Name") )
-    {
-        $Parameters.name = $Name
-    }
+        if ( $PSBoundParameters.ContainsKey("Name") )
+        {
+            $Parameters.name = $Name
+        }
 
-    if ( $PSBoundParameters.ContainsKey("Announcement") )
-    {
-        $Parameters.announcement = $Announcement
-    }
+        if ( $PSBoundParameters.ContainsKey("Announcement") )
+        {
+            $Parameters.announcement = $Announcement
+        }
 
-    if ( $PSBoundParameters.ContainsKey("ShowAnnouncement") )
-    {
-        $Parameters.show_announcement = $ShowAnnouncement
-    }
+        if ( $PSBoundParameters.ContainsKey("ShowAnnouncement") )
+        {
+            $Parameters.show_announcement = $ShowAnnouncement
+        }
 
-    if ( $PSBoundParameters.ContainsKey("SuiteMode") )
-    {
-        $Parameters.suite_mode = $SuiteMode
-    }
+        if ( $PSBoundParameters.ContainsKey("SuiteMode") )
+        {
+            $Parameters.suite_mode = $SuiteMode
+        }
 
-    if ( $PSBoundParameters.ContainsKey("IsCompleted") )
-    {
-        $Parameters.is_completed = $IsCompleted
-    }
+        if ( $PSBoundParameters.ContainsKey("IsCompleted") )
+        {
+            $Parameters.is_completed = $IsCompleted
+        }
 
-    Submit-TestRailUri -Uri $Uri -Parameters $Parameters
+        Submit-TestRailUri -Uri $Uri -Parameters $Parameters
+    }
 }
 
 function Remove-Project
@@ -166,8 +177,11 @@ function Remove-Project
         $ProjectId
     )
 
-    $Uri = "delete_project/$ProjectId"
-    $Parameters = @{}
+    PROCESS
+    {
+        $Uri = "delete_project/$ProjectId"
+        $Parameters = @{}
 
-    Submit-TestRailUri -Uri $Uri -Parameters $Parameters
+        Submit-TestRailUri -Uri $Uri -Parameters $Parameters
+    }
 }
