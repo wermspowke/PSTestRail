@@ -89,7 +89,6 @@ FunctionsToExport = @(
     'Add-TestRailResults',
     'Add-TestRailResultForCase',
     'Add-TestRailResultsForCases',
-    'Close-TestRailRun',
     'Get-TestRailDebug',
     'Get-TestRailResults',
     'Get-TestRailResultsForCase',
@@ -101,11 +100,13 @@ FunctionsToExport = @(
     'Get-TestRailSuites',
     'Get-TestRailTests',
     'Initialize-TestRailSession',
-    'New-TestRailRun',
     'New-TestRailResult'
     'Request-TestRailUri',
     'Set-TestRailDebug',
     'Set-TestRailRun',
+    'Start-TestRailRun',
+    'Stop-TestRailRun',
+    'Remove-TestRailRun',
     'Submit-TestRailUri'
 )
 

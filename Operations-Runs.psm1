@@ -173,7 +173,6 @@ function Start-TestRailRun
         $Uri = "add_run/$ProjectId"
 
         $Parameters = @{
-            milestone_id = $MilestoneId
             suite_id = $SuiteId
             name = $Name
             description = $Description
@@ -184,6 +183,10 @@ function Start-TestRailRun
         {
             $Parameters.case_ids = $CaseId
         }
+        if ( $PSBoundParameters.ContainsKey("MilestoneId") )
+		{
+			Add-UriParameters -Parameters $Parameters -Hash @{ milestone_id = $MilestoneId }
+		}
 
         Submit-TestRailUri -Uri $Uri -Parameters $Parameters
     }
