@@ -70,7 +70,8 @@ NestedModules = @(
     'Operations-Runs.psm1',  
     'Operations-Sections.psm1',
     'Operations-Suites.psm1',
-    'Operations-Tests.psm1'
+    'Operations-Tests.psm1',
+    'Operations-Reports.psm1'
 )
 
 # Functions to export from this module
@@ -102,12 +103,15 @@ FunctionsToExport = @(
     'Initialize-TestRailSession',
     'New-TestRailResult'
     'Request-TestRailUri',
+	'Add-UriParameters',
     'Set-TestRailDebug',
     'Set-TestRailRun',
     'Start-TestRailRun',
     'Stop-TestRailRun',
     'Remove-TestRailRun',
-    'Submit-TestRailUri'
+    'Submit-TestRailUri',
+    'Get-TestRailReports',
+    'Start-TestRailReport'
 )
 
 # Cmdlets to export from this module
